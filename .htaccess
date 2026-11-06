@@ -1,0 +1,40 @@
+# Force HTTPS and the exact canonical host — avoids Bing/Google indexing
+# http/https and www/non-www as separate, duplicate versions of each page.
+# Apache only. On Nginx/Netlify/Vercel/Cloudflare Pages, set the equivalent
+# redirect in that host's own settings instead — this file has no effect there.
+RewriteEngine On
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} !^muaphysicians\.com/breathizen/breathizen\.html$ [NC]
+RewriteRule ^ https://muaphysicians.com/breathizen/breathizen.html%{REQUEST_URI} [L,R=301]
+
+# Custom 404 page
+ErrorDocument 404 /404.html
+
+# Compress text-based assets
+<IfModule mod_deflate.c>
+ AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/xml application/xhtml+xml application/rss+xml application/javascript application/x-javascript image/svg+xml
+</IfModule>
+
+# Browser caching for static assets
+<IfModule mod_expires.c>
+ ExpiresActive On
+ ExpiresByType image/jpg "access plus 1 year"
+ ExpiresByType image/jpeg "access plus 1 year"
+ ExpiresByType image/png "access plus 1 year"
+ ExpiresByType image/webp "access plus 1 year"
+ ExpiresByType image/gif "access plus 1 year"
+ ExpiresByType image/svg+xml "access plus 1 year"
+ ExpiresByType text/css "access plus 1 month"
+ ExpiresByType application/javascript "access plus 1 month"
+ ExpiresByType text/html "access plus 1 day"
+</IfModule>
+
+# Basic security headers
+<IfModule mod_headers.c>
+ Header set X-Content-Type-Options "nosniff"
+ Header set X-Frame-Options "SAMEORIGIN"
+ Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Short link: /order/ -> official store (302 so the destination can change)
+RewriteRule ^order/?$ https://forbreathizen.com/btz-aff-buy-dtc/?aff_id=238250 [R=302,L,NE]
